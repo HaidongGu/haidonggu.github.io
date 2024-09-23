@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chinese Vocabulary Review</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .question {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin: 5px 0;
+        }
+
+        .dropdown {
+            margin-bottom: 20px;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .result {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .correct {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .incorrect {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Chinese Vocabulary Review</h1>
+
+    <div class="container">
+        <div class="dropdown">
+            <label for="numQuestions">Select Number of Questions:</label>
+            <select id="numQuestions">
+                <option value="2">2</option>
+                <option value="5">5</option>
+                <option value="10">10</option>
+                <option value="20">20</option>
+                <option value="72">All (72)</option>
+            </select>
+            <button onclick="generateQuestions()">Generate Questions</button>
+        </div>
+
+        <form id="quizForm">
+            <!-- Questions will be dynamically inserted here -->
+        </form>
+
+        <button id="submitBtn" style="display:none;" onclick="submitQuiz()">Submit</button>
+    </div>
+
+    <script>
+        const questionBank = [
+{chinese: "海底捞针", english: "find a needle in a haystack (seabed)"},
+{chinese: "害群之马", english: "one person brings down many ppl, a bad horse make the whole group lose"},
+{chinese: "好逸恶劳", english: "wants to achieve smth but never worked hard"},
+{chinese: "胡作非为", english: "misbehave"},
+{chinese: "进退维谷", english: "dilemma 无论是进还是退，都是处在困境之中"},
+{chinese: "居安思危", english: "prepare for danger"},
+{chinese: "口是心非", english: "say sth but think otherwise"},
+{chinese: "苦口婆心", english: "advice someone (wise words as valuable as gold)"},
+{chinese: "名列前茅", english: "strive fr the best"},
+{chinese: "拍案叫绝", english: "amazing"},
+{chinese: "潜移默化", english: "small things can affect those around u"},
+{chinese: "三思而行", english: "think bfr acting"},
+{chinese: "舍已为人", english: "selfless"},
+{chinese: "事半功倍", english: "do more w less"},
+{chinese: "守望相助", english: "help others"},
+{chinese: "熟能生巧", english: "practice makes perfect"},
+{chinese: "水落石出", english: "truth will reveal itself"},
+{chinese: "司空见惯", english: "common occurence"},
+{chinese: "天渊之别", english: "great difference"},
+{chinese: "望尘莫及", english: "out of reach"},
+{chinese: "温故知新", english: "review the past, learb from new"},
+{chinese: "心猿意马", english: "jump / move around rapidly/ cannot focus"},
+{chinese: "袖手旁观", english: "stand aside to watch"},
+{chinese: "开卷有益", english: "read / study is good"},
+{chinese: "滴水穿石", english: "constant perseverence leads to success, overcome difficulties"},
+{chinese: "一诺千金", english: "a promise worth a lot"},
+{chinese: "以礼待人", english: "treat others respectfully"},
+{chinese: "心疑", english: "strange / intriguing --> curious"},
+{chinese: "尴尬", english: "awkward / embarrassing"},
+{chinese: "维护", english: "to protect or maintain"},
+{chinese: "一帆风顺", english: "smooth sailing"},
+{chinese: "策略", english: "strategy"},
+{chinese: "赖床", english: "laze in bed, 不想起床"},
+{chinese: "恐惧", english: "frightened"},
+{chinese: "哀求", english: "beg for mercy"},
+{chinese: "挨打", english: "got beaten"},
+{chinese: "缘故", english: "cause"},
+{chinese: "嗓子眼", english: "throat"},
+{chinese: "示意", english: "signal"},
+{chinese: "包袱", english: "heavy load / burden"},
+{chinese: "征求", english: "seek sth"},
+{chinese: "人人皆晓", english: "everybody knows"},
+{chinese: "慢条斯理", english: "slow pace"},
+{chinese: "一命呜呼", english: "death"},
+{chinese: "计较", english: "haggle / compare"},
+{chinese: "讲究", english: "pay particular attention, 注重"},
+{chinese: "何必", english: "why bother"},
+{chinese: "称赞", english: "praise"},
+{chinese: "徒劳无功", english: "work to no avail"},
+{chinese: "机械", english: "scheming / machinery"},
+{chinese: "蓬头垢面", english: "messy hair, dirty face, unsightly"},
+{chinese: "气馁", english: "to be discouraged, give up"},
+{chinese: "梦寐以求", english: "to yearn for something day and night, something that being dream for"},
+{chinese: "踪影", english: "trace / trail / presence"},
+{chinese: "缓慢", english: "slow pace"},
+{chinese: "晋级", english: "advancement in rank / promotion"},
+{chinese: "偶尔", english: "occasionally"},
+{chinese: "中央", english: "central"},
+{chinese: "绞尽脑汁", english: "racking one's brains"},
+{chinese: "由衷", english: "sincere"},
+{chinese: "疑惑", english: "curious / uncertainty"},
+{chinese: "别具一格", english: "unique"},
+{chinese: "独树一帜", english: "act as a loner / stand out / unique"},
+{chinese: "抨击", english: "to attack"},
+{chinese: "挫折", english: "setback"},
+{chinese: "拜访", english: "pay a visit"},
+{chinese: "漫步", english: "walk around"},
+{chinese: "大名鼎鼎", english: "grand reputation; renowned "},
+{chinese: "陷入", english: "to sink in / get caught up"},
+{chinese: "窍门", english: "tips / 能解决问题而又简便易行的巧妙方法。"},
+{chinese: "飞跃", english: "to leap"},
+{chinese: "传播", english: "to spread; normally a rumour"},
+            // Add the rest of the 72 pairs...
+        ];
+
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function generateQuestions() {
+            const numQuestions = parseInt(document.getElementById("numQuestions").value);
+            const quizForm = document.getElementById("quizForm");
+            quizForm.innerHTML = ""; // Clear previous questions
+            const shuffledQuestions = shuffle([...questionBank]).slice(0, numQuestions);
+
+            shuffledQuestions.forEach((question, index) => {
+                const questionElement = document.createElement("div");
+                questionElement.classList.add("question");
+                questionElement.innerHTML = `
+                    <strong>${index + 1}. What is the meaning of "${question.chinese}"?</strong>
+                    <div id="question-${index}-CN"  style="display: none">${question.chinese}</div>
+                    <div id="question-${index}-EN"  style="display: none">${question.english}</div>
+                    <br>
+
+                    ${generateOptions(question, index)}
+                `;
+                quizForm.appendChild(questionElement);
+            });
+
+            document.getElementById("submitBtn").style.display = "inline-block"; // Show submit button
+            document.getElementById("submitBtn").disabled = false; 
+        }
+
+        function generateOptions(question, index) {
+            const correctAnswer = question.english;
+            const wrongAnswers = getUniqueWrongAnswers(correctAnswer);
+            const allOptions = shuffle([correctAnswer, ...wrongAnswers]);
+
+            return allOptions.map(option => `
+                <label>
+                    <input type="radio" name="question${index}" value="${option}"> ${option}
+                </label>
+            `).join("");
+        }
+
+        function getUniqueWrongAnswers(correctAnswer) {
+            let wrongAnswers = [];
+
+            while (wrongAnswers.length < 3) {
+                const randomAnswer = questionBank[Math.floor(Math.random() * questionBank.length)].english;
+                if (!wrongAnswers.includes(randomAnswer) && randomAnswer !== correctAnswer) {
+                    wrongAnswers.push(randomAnswer);
+                }
+            }
+
+            return wrongAnswers;
+        }
+
+        function submitQuiz() {
+            const quizForm = document.getElementById("quizForm");
+            const totalQuestions = quizForm.getElementsByClassName("question").length;
+
+            for (let i = 0; i < totalQuestions; i++) {
+                const selectedOption = document.querySelector(`input[name="question${i}"]:checked`);
+                const selectedChinese = document.getElementById(`question-${i}-CN`).textContent;
+                const correctAnswer = document.getElementById(`question-${i}-EN`).textContent;
+
+                const resultDiv = document.createElement("div");
+                resultDiv.classList.add("result");
+
+                if (selectedOption && selectedOption.value === correctAnswer) {
+                    resultDiv.classList.add("correct");
+                    resultDiv.textContent = "Correct!";
+                } else {
+                    resultDiv.classList.add("incorrect");
+                    resultDiv.textContent = `Incorrect! The correct answer is "${correctAnswer}".`;
+                }
+
+                quizForm.children[i].appendChild(resultDiv);
+            }
+
+            document.getElementById("submitBtn").disabled = true; // Disable after submission
+        }
+    </script>
+
+</body>
+</html>
